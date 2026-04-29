@@ -7,7 +7,7 @@ import os
 # --- 1. PAGE CONFIG & THEME ---
 st.set_page_config(page_title="PDF to Voice Pro", page_icon="🎙️", layout="wide")
 
-# Custom CSS for the professional dark theme and gradient buttons
+# Professional Dark Theme CSS
 st.markdown("""
     <style>
     .stApp { background-color: #0e1117; color: #ffffff; }
@@ -16,6 +16,11 @@ st.markdown("""
         color: white; border: none; border-radius: 10px; font-weight: bold; height: 3em;
         width: 100%;
     }
+    /* Hide Streamlit branding for a professional look */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .stDeployButton {display:none;}
     </style>
     """, unsafe_allow_html=True)
 
@@ -40,10 +45,20 @@ with st.sidebar:
     1. Upload your PDF document.
     2. We extract and analyze the text.
     3. Our Turbo Engine generates the audio.
-    
-    **🔒 Privacy:**
-    Your files are processed in real-time and are never stored on our servers.
     """)
+    
+    # --- MONETIZATION: BUY ME A COFFEE ---
+    st.divider()
+    st.markdown("### ☕ Support the Developer")
+    st.write("If this tool saved you time today, consider fueling the next update!")
+    
+    bmc_button = """
+    <a href="https://www.buymeacoffee.com/escapetheordinary" target="_blank">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+        alt="Buy Me A Coffee" style="height: 50px !important;width: 180px !important;" >
+    </a>
+    """
+    st.markdown(bmc_button, unsafe_allow_html=True)
 
 # --- 4. MAIN INTERFACE ---
 st.title("🎙️ PDF to Voice Pro")
@@ -73,12 +88,11 @@ if uploaded_file and full_text:
     if st.button("🚀 Generate High-Speed MP3"):
         output_path = "final_audio_pro.mp3"
         
-        # Optimized chunk size for stability across all languages
         chunks = [full_text[i:i+2500] for i in range(0, len(full_text), 2500)]
         
         async def convert_chunk(index, text):
             filename = f"part_{index}.mp3"
-            # Spanish Fix: Stagger the start times to prevent server timeouts
+            # Stagger timing for Spanish/Stability
             if "Spanish" in selected_lang:
                 await asyncio.sleep(index * 0.6) 
             
@@ -91,16 +105,14 @@ if uploaded_file and full_text:
 
         async def process_parallel():
             tasks = [convert_chunk(i, chunk) for i, chunk in enumerate(chunks)]
-            # Run all chunks at once (Parallel Processing)
             filenames = await asyncio.gather(*tasks)
             
-            # Combine all small MP3 parts into one master file
             with open(output_path, "wb") as master:
                 for fname in filenames:
                     if fname and os.path.exists(fname):
                         with open(fname, "rb") as part:
                             master.write(part.read())
-                        os.remove(fname) # Clean up temp files
+                        os.remove(fname) 
 
         with st.status("⚡ Turbo-processing your audio... please wait.", expanded=True) as status:
             try:
@@ -117,15 +129,15 @@ if uploaded_file and full_text:
             except Exception as e:
                 st.error(f"Error during generation: {e}")
 
-# --- 6. FAQ & FOOTER ---
+# --- 6. FAQ ---
 st.markdown("---")
 st.markdown("""
 ### 🛠️ Frequently Asked Questions
-**Does this translate my PDF?** No. This tool reads the text exactly as it is written. If your PDF is in Spanish, make sure to select a Spanish voice!
+**Does this translate my PDF?** No. This tool reads the text exactly as written. Choose the voice that matches your PDF's language!
 
-**What is the character limit?** Our Turbo Engine is optimized for documents under 50,000 characters. For larger files, we recommend uploading in sections.
+**What is the character limit?** The engine is optimized for documents under 50,000 characters for the best speed.
 
-**Is my data safe?** Yes. We use "volatile processing," meaning your text is gone the moment you close the browser tab.
+**Is my data safe?** Yes. We use volatile processing; your files are cleared the moment you close the tab.
 """)
 
 st.caption("PDF to Voice Pro | High-Performance AI Utility | 2026")
