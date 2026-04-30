@@ -4,11 +4,21 @@ import asyncio
 import fitz
 import os
 
-# --- 1. PAGE CONFIG & THEME ---
-st.set_page_config(page_title="PDF to Voice Pro", page_icon="🎙️", layout="wide")
+# --- 1. PAGE CONFIG & SEO HEADERS ---
+# This tells Google exactly what the page is about before the code even runs
+st.set_page_config(
+    page_title="PDF to Voice Pro | High-Speed AI Converter",
+    page_icon="🎙️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# Professional Dark Theme CSS
+# Professional Theme + Google Bot "Crawl-Me" Meta Tags
 st.markdown("""
+    <head>
+        <meta name="robots" content="index, follow">
+        <meta name="description" content="Convert PDFs to high-quality audio instantly with our Turbo Engine. Free, private, and fast.">
+    </head>
     <style>
     .stApp { background-color: #0e1117; color: #ffffff; }
     .stButton>button { 
@@ -16,13 +26,13 @@ st.markdown("""
         color: white; border: none; border-radius: 10px; font-weight: bold; height: 3em;
         width: 100%;
     }
-    /* Hide Streamlit branding for a professional look */
+    /* Clean UI: Hide the 'crap' in the top right */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     .stDeployButton {display:none;}
     </style>
-    """, unsafe_allow_html=True)
+    """, unsafe_allow_True=True)
 
 # --- 2. VOICE DATA ---
 voice_data = {
@@ -42,9 +52,9 @@ with st.sidebar:
     
     st.markdown("""
     **How it works:**
-    1. Upload your PDF document.
-    2. We extract and analyze the text.
-    3. Our Turbo Engine generates the audio.
+    1. Upload your PDF.
+    2. We extract the text.
+    3. Our Turbo Engine creates your MP3.
     """)
     
     # --- MONETIZATION: BUY ME A COFFEE ---
@@ -88,11 +98,12 @@ if uploaded_file and full_text:
     if st.button("🚀 Generate High-Speed MP3"):
         output_path = "final_audio_pro.mp3"
         
+        # Parallel chunks for maximum speed
         chunks = [full_text[i:i+2500] for i in range(0, len(full_text), 2500)]
         
         async def convert_chunk(index, text):
             filename = f"part_{index}.mp3"
-            # Stagger timing for Spanish/Stability
+            # Stability Fix for Spanish/High Traffic
             if "Spanish" in selected_lang:
                 await asyncio.sleep(index * 0.6) 
             
@@ -114,7 +125,7 @@ if uploaded_file and full_text:
                             master.write(part.read())
                         os.remove(fname) 
 
-        with st.status("⚡ Turbo-processing your audio... please wait.", expanded=True) as status:
+        with st.status("⚡ Turbo-processing your audio...", expanded=True) as status:
             try:
                 asyncio.run(process_parallel())
                 status.update(label="✅ Conversion Successful!", state="complete")
@@ -129,13 +140,13 @@ if uploaded_file and full_text:
             except Exception as e:
                 st.error(f"Error during generation: {e}")
 
-# --- 6. FAQ ---
+# --- 6. SEO-FRIENDLY FAQ ---
 st.markdown("---")
 st.markdown("""
 ### 🛠️ Frequently Asked Questions
-**Does this translate my PDF?** No. This tool reads the text exactly as written. Choose the voice that matches your PDF's language!
+**Does this translate my PDF?** No. This tool reads the text as written. If your PDF is in Spanish, select a Spanish voice!
 
-**What is the character limit?** The engine is optimized for documents under 50,000 characters for the best speed.
+**What is the character limit?** The engine is optimized for documents under 50,000 characters.
 
 **Is my data safe?** Yes. We use volatile processing; your files are cleared the moment you close the tab.
 """)
