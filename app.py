@@ -5,7 +5,6 @@ import fitz
 import os
 
 # --- 1. PAGE CONFIG & SEO HEADERS ---
-# This tells Google exactly what the page is about before the code even runs
 st.set_page_config(
     page_title="PDF to Voice Pro | High-Speed AI Converter",
     page_icon="🎙️",
@@ -17,7 +16,7 @@ st.set_page_config(
 st.markdown("""
     <head>
         <meta name="robots" content="index, follow">
-        <meta name="description" content="Convert PDFs to high-quality audio instantly with our Turbo Engine. Free, private, and fast.">
+        <meta name="description" content="Convert PDFs to high-quality audio instantly. Free, private, and fast.">
     </head>
     <style>
     .stApp { background-color: #0e1117; color: #ffffff; }
@@ -26,13 +25,13 @@ st.markdown("""
         color: white; border: none; border-radius: 10px; font-weight: bold; height: 3em;
         width: 100%;
     }
-    /* Clean UI: Hide the 'crap' in the top right */
+    /* Clean UI: Hide the Streamlit menu and footer */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     .stDeployButton {display:none;}
     </style>
-    """, unsafe_allow_True=True)
+    """, unsafe_allow_html=True)
 
 # --- 2. VOICE DATA ---
 voice_data = {
@@ -93,17 +92,17 @@ with col2:
 st.divider()
 
 # --- 5. THE TURBO CHUNKER ENGINE ---
-if uploaded_file and full_text:
+if uploaded_file and 'full_text' in locals() and full_text:
     st.markdown("### 🔊 3. Audio Generation")
     if st.button("🚀 Generate High-Speed MP3"):
         output_path = "final_audio_pro.mp3"
         
-        # Parallel chunks for maximum speed
+        # Split text into chunks for faster processing
         chunks = [full_text[i:i+2500] for i in range(0, len(full_text), 2500)]
         
         async def convert_chunk(index, text):
             filename = f"part_{index}.mp3"
-            # Stability Fix for Spanish/High Traffic
+            # Stability Fix for Spanish or high-volume processing
             if "Spanish" in selected_lang:
                 await asyncio.sleep(index * 0.6) 
             
