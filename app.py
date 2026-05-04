@@ -13,15 +13,15 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. THE GOOGLE TAG (SILENT & INVISIBLE) ---
-# This fixes the "text at the top" issue by running the script in a hidden box.
+# --- 2. THE NEW GOOGLE TAG (SILENT & INVISIBLE) ---
+# Updated with your new ID: G-SD6ELDD8LV
 ga_code = """
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-E235EQ6RW7"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SD6ELDD8LV"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-E235EQ6RW7');
+  gtag('config', 'G-SD6ELDD8LV');
 </script>
 """
 components.html(ga_code, height=0)
