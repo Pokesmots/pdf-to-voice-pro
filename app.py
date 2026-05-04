@@ -1,10 +1,11 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import edge_tts
 import asyncio
 import fitz
 import os
 
-# --- 1. PAGE CONFIG & SEO HEADERS ---
+# --- 1. PAGE CONFIG ---
 st.set_page_config(
     page_title="PDF to Voice Pro | High-Speed AI Converter",
     page_icon="🎙️",
@@ -12,20 +13,21 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Professional Theme + Google Tag + SEO Meta Tags
+# --- 2. THE GOOGLE TAG (SILENT LOAD) ---
+# This loads the tag in a hidden 0-pixel container so it doesn't show up as text.
+ga_code = """
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E235EQ6RW7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-E235EQ6RW7');
+</script>
+"""
+components.html(ga_code, height=0)
+
+# --- 3. CUSTOM STYLING (THEME) ---
 st.markdown("""
-    <head>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-E235EQ6RW7"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-E235EQ6RW7');
-        </script>
-        
-        <meta name="robots" content="index, follow">
-        <meta name="description" content="Convert PDFs to high-quality audio instantly. Free, private, and fast.">
-    </head>
     <style>
     .stApp { background-color: #0e1117; color: #ffffff; }
     .stButton>button { 
@@ -40,14 +42,14 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. VOICE DATA ---
+# --- 4. VOICE DATA ---
 voice_data = {
     "English (US)": ["en-US-AvaNeural", "en-US-GuyNeural", "en-US-EmmaNeural", "en-US-BrianNeural"],
     "English (UK)": ["en-GB-SoniaNeural", "en-GB-RyanNeural"],
     "Spanish": ["es-MX-DaliaNeural", "es-MX-JorgeNeural", "es-ES-AlvaroNeural", "es-US-AlonsoNeural"],
 }
 
-# --- 3. SIDEBAR ---
+# --- 5. SIDEBAR ---
 with st.sidebar:
     st.header("⚙️ System Settings")
     selected_lang = st.selectbox("Select Language", list(voice_data.keys()))
@@ -75,7 +77,7 @@ with st.sidebar:
     """
     st.markdown(bmc_button, unsafe_allow_html=True)
 
-# --- 4. MAIN INTERFACE ---
+# --- 6. MAIN INTERFACE ---
 st.title("🎙️ PDF to Voice Pro")
 st.subheader("Convert your documents into high-quality, audible study guides.")
 
@@ -97,7 +99,7 @@ with col2:
 
 st.divider()
 
-# --- 5. THE TURBO CHUNKER ENGINE ---
+# --- 7. THE TURBO CHUNKER ENGINE ---
 if uploaded_file and 'full_text' in locals() and full_text:
     st.markdown("### 🔊 3. Audio Generation")
     if st.button("🚀 Generate High-Speed MP3"):
@@ -143,7 +145,7 @@ if uploaded_file and 'full_text' in locals() and full_text:
             except Exception as e:
                 st.error(f"Error during generation: {e}")
 
-# --- 6. SEO-FRIENDLY FAQ ---
+# --- 8. SEO-FRIENDLY FAQ ---
 st.markdown("---")
 st.markdown("""
 ### 🛠️ Frequently Asked Questions
