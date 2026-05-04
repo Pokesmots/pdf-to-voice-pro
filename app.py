@@ -12,9 +12,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Professional Theme + Google Bot "Crawl-Me" Meta Tags
+# Professional Theme + Google Tag + SEO Meta Tags
 st.markdown("""
     <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-E235EQ6RW7"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-E235EQ6RW7');
+        </script>
+        
         <meta name="robots" content="index, follow">
         <meta name="description" content="Convert PDFs to high-quality audio instantly. Free, private, and fast.">
     </head>
@@ -25,7 +33,6 @@ st.markdown("""
         color: white; border: none; border-radius: 10px; font-weight: bold; height: 3em;
         width: 100%;
     }
-    /* Clean UI: Hide the Streamlit menu and footer */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
@@ -56,7 +63,6 @@ with st.sidebar:
     3. Our Turbo Engine creates your MP3.
     """)
     
-    # --- MONETIZATION: BUY ME A COFFEE ---
     st.divider()
     st.markdown("### ☕ Support the Developer")
     st.write("If this tool saved you time today, consider fueling the next update!")
@@ -97,12 +103,10 @@ if uploaded_file and 'full_text' in locals() and full_text:
     if st.button("🚀 Generate High-Speed MP3"):
         output_path = "final_audio_pro.mp3"
         
-        # Split text into chunks for faster processing
         chunks = [full_text[i:i+2500] for i in range(0, len(full_text), 2500)]
         
         async def convert_chunk(index, text):
             filename = f"part_{index}.mp3"
-            # Stability Fix for Spanish or high-volume processing
             if "Spanish" in selected_lang:
                 await asyncio.sleep(index * 0.6) 
             
@@ -147,7 +151,7 @@ st.markdown("""
 
 **What is the character limit?** The engine is optimized for documents under 50,000 characters.
 
-**Is my data safe?** Yes. We use volatile processing; your files are cleared the moment you close the tab.
+**Is my data safe?** Yes. We use volatile processing; your files are cleared the moment you close the tab. We use basic Google Analytics to see how many people use the tool, but we never see your PDFs.
 """)
 
 st.caption("PDF to Voice Pro | High-Performance AI Utility | 2026")
