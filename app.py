@@ -5,7 +5,7 @@ import asyncio
 import fitz
 import os
 
-# --- 1. PAGE CONFIG ---
+# --- 1. PAGE CONFIG (Correct way to handle SEO) ---
 st.set_page_config(
     page_title="PDF to Voice Pro | High-Speed AI Converter",
     page_icon="🎙️",
@@ -13,8 +13,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. THE GOOGLE TAG (SILENT LOAD) ---
-# This loads the tag in a hidden 0-pixel container so it doesn't show up as text.
+# --- 2. THE GOOGLE TAG (SILENT & INVISIBLE) ---
+# This fixes the "text at the top" issue by running the script in a hidden box.
 ga_code = """
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-E235EQ6RW7"></script>
 <script>
@@ -26,7 +26,7 @@ ga_code = """
 """
 components.html(ga_code, height=0)
 
-# --- 3. CUSTOM STYLING (THEME) ---
+# --- 3. CUSTOM STYLING (The Professional Look) ---
 st.markdown("""
     <style>
     .stApp { background-color: #0e1117; color: #ffffff; }
