@@ -157,3 +157,26 @@ st.markdown("""
 """)
 
 st.caption("PDF to Voice Pro | High-Performance AI Utility | 2026")
+
+footer_html = """
+    <style>
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: transparent;
+        color: grey;
+        text-align: center;
+        font-size: 14px;
+        padding: 10px;
+        font-family: sans-serif;
+    }
+    </style>
+    <div class="footer">
+        <p>PDF to Voice Pro | <strong>Stop Reading. Start Listening.</strong></p>
+    </div>
+"""
+
+# Render the footer
+st.markdown(footer_html, unsafe_allow_html=True)
