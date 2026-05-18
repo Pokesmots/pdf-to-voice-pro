@@ -5,16 +5,15 @@ import asyncio
 import fitz
 import os
 
-# --- 1. PAGE CONFIG (Correct way to handle SEO) ---
+# --- 1. PAGE CONFIG (SEO & Tab Customization) ---
 st.set_page_config(
-    page_title="PDF to Voice Pro | High-Speed AI Converter",
-    page_icon="🎙️",
+    page_title="PDF to Voice Pro | Free Speechify Alternative",
+    page_icon="🔊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- 2. THE NEW GOOGLE TAG (SILENT & INVISIBLE) ---
-# Updated with your new ID: G-SD6ELDD8LV
+# --- 2. GOOGLE ANALYTICS (Silent Tracking) ---
 ga_code = """
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-SD6ELDD8LV"></script>
 <script>
@@ -26,7 +25,7 @@ ga_code = """
 """
 components.html(ga_code, height=0)
 
-# --- 3. CUSTOM STYLING (The Professional Look) ---
+# --- 3. CUSTOM STYLING (Modern UI Layout) ---
 st.markdown("""
     <style>
     .stApp { background-color: #0e1117; color: #ffffff; }
@@ -39,8 +38,16 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     .stDeployButton {display:none;}
+    
+    /* Padding adjustments to ensure content doesn't get cut off by fixed footer */
+    .main-content {
+        padding-bottom: 60px;
+    }
     </style>
     """, unsafe_allow_html=True)
+
+# Wrap main interface elements in a div to preserve layout spacing
+st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
 # --- 4. VOICE DATA ---
 voice_data = {
@@ -145,7 +152,19 @@ if uploaded_file and 'full_text' in locals() and full_text:
             except Exception as e:
                 st.error(f"Error during generation: {e}")
 
-# --- 8. SEO-FRIENDLY FAQ ---
+# --- 8. SEO ADVANTAGE TEXT SECTION ---
+st.markdown("---")
+st.markdown("### 🚀 Why Choose a Free Browser-Based TTS?")
+st.markdown("""
+Looking for a secure **free Speechify alternative** or a way to listen to documents without an **ElevenReader subscription** limit? 
+PDF to Voice Pro is a lightweight, high-performance web utility built for students, commuters, and professionals who need to convert dense textbooks and study guides to audio on the fly. 
+
+* **No Subscriptions or Credit Caps:** Unlike ElevenLabs or NaturalReader, there are no recurring monthly credit resets or paywalls standing between you and your learning.
+* **Privacy-First Design:** Your security matters. Files are processed entirely inside your local browser memory—no private data or text is saved to external database servers.
+* **Completely Free Access:** No hidden microtransactions, no predatory 'free trials' that automatically charge your card, and zero software installation required.
+""")
+
+# --- 9. STANDARD FAQ ---
 st.markdown("---")
 st.markdown("""
 ### 🛠️ Frequently Asked Questions
@@ -157,7 +176,9 @@ st.markdown("""
 """)
 
 st.caption("PDF to Voice Pro | High-Performance AI Utility | 2026")
+st.markdown('</div>', unsafe_allow_html=True) # End main-content container
 
+# --- 10. FIXED BRANDED FOOTER ---
 footer_html = """
     <style>
     .footer {
@@ -165,18 +186,18 @@ footer_html = """
         left: 0;
         bottom: 0;
         width: 100%;
-        background-color: transparent;
-        color: grey;
+        background-color: rgba(14, 17, 23, 0.95);
+        color: #8a99ad;
         text-align: center;
         font-size: 14px;
-        padding: 10px;
+        padding: 12px;
         font-family: sans-serif;
+        border-top: 1px solid #262730;
+        z-index: 999;
     }
     </style>
     <div class="footer">
         <p>PDF to Voice Pro | <strong>Stop Reading. Start Listening.</strong></p>
     </div>
 """
-
-# Render the footer
 st.markdown(footer_html, unsafe_allow_html=True)
