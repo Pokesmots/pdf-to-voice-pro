@@ -25,7 +25,7 @@ ga_code = """
 """
 components.html(ga_code, height=0)
 
-# --- 3. CUSTOM STYLING (Modern UI Layout & High-Visibility Floating Toggle) ---
+# --- 3. CUSTOM STYLING (Modern UI Layout & Fixed Controls) ---
 st.markdown("""
     <style>
     .stApp { background-color: #0e1117; color: #ffffff; }
@@ -39,32 +39,16 @@ st.markdown("""
     header {visibility: hidden;}
     .stDeployButton {display:none;}
     
-    /* BREAK THE BUTTON OUT OF THE HIDDEN HEADER ZONE & FORCE IT TO SHOW */
+    /* Ensure default toggle button remains visible if viewport opens it */
     button[data-testid="stSidebarCollapseButton"] {
         background-color: #0072ff !important;
         color: white !important;
         border-radius: 50% !important;
-        width: 45px !important;
-        height: 45px !important;
-        position: fixed !important;
-        left: 20px !important;
-        top: 20px !important;
-        box-shadow: 0px 4px 12px rgba(0, 198, 255, 0.5) !important;
-        z-index: 999999 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-    
-    /* Make sure the internal arrow icon contrasts perfectly on the new blue background */
-    button[data-testid="stSidebarCollapseButton"] svg {
-        fill: white !important;
-        color: white !important;
     }
     
     /* Padding adjustments to ensure content doesn't get cut off by fixed footer */
     .main-content {
-        padding-bottom: 60px;
+        padding-bottom: 80px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -72,7 +56,7 @@ st.markdown("""
 # Wrap main interface elements in a div to preserve layout spacing
 st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
-# --- 4. VOICE DATA (With French Support!) ---
+# --- 4. VOICE DATA ---
 voice_data = {
     "English (US)": ["en-US-AvaNeural", "en-US-GuyNeural", "en-US-EmmaNeural", "en-US-BrianNeural"],
     "English (UK)": ["en-GB-SoniaNeural", "en-GB-RyanNeural"],
@@ -80,38 +64,24 @@ voice_data = {
     "French": ["fr-FR-DeniseNeural", "fr-FR-HenriNeural", "fr-CA-SylvieNeural"],
 }
 
-# --- 5. SIDEBAR ---
-with st.sidebar:
-    st.header("⚙️ System Settings")
-    selected_lang = st.selectbox("Select Language", list(voice_data.keys()))
-    selected_voice = st.selectbox("Select Voice Talent", voice_data[selected_lang])
-    
-    st.divider()
-    st.info("💡 Pro Tip: Male voices often sound best at 1.2x speed for dense study notes.")
-    
-    st.markdown("""
-    **How it works:**
-    1. Upload your PDF.
-    2. We extract the text.
-    3. Our Turbo Engine creates your MP3.
-    """)
-    
-    st.divider()
-    st.markdown("### ☕ Support the Developer")
-    st.write("If this tool saved you time today, consider fueling the next update!")
-    
-    bmc_button = """
-    <a href="https://www.buymeacoffee.com/escapetheordinary" target="_blank">
-        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
-        alt="Buy Me A Coffee" style="height: 50px !important;width: 180px !important;" >
-    </a>
-    """
-    st.markdown(bmc_button, unsafe_allow_html=True)
-
-# --- 6. MAIN INTERFACE ---
+# --- 5. TOP PANEL / FALLBACK SYSTEM SETTINGS ---
+# This brings the controls front and center so mobile or small-screen users never lose them
 st.title("🎙️ PDF to Voice Pro")
 st.subheader("Convert your documents into high-quality, audible study guides.")
 
+st.markdown("### ⚙️ System Settings")
+voice_col1, voice_col2 = st.columns(2)
+
+with voice_col1:
+    selected_lang = st.selectbox("Select Language", list(voice_data.keys()), key="main_lang")
+with voice_col2:
+    selected_voice = st.selectbox("Select Voice Talent", voice_data[selected_lang], key="main_voice")
+
+st.info("💡 Pro Tip: Male voices often sound best at 1.2x speed for dense study notes.")
+
+st.divider()
+
+# --- 6. MAIN INTERFACE (FILE MANAGEMENT) ---
 col1, col2 = st.columns([1, 1])
 
 with col1:
