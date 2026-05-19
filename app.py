@@ -49,11 +49,12 @@ st.markdown("""
 # Wrap main interface elements in a div to preserve layout spacing
 st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
-# --- 4. VOICE DATA ---
+# --- 4. VOICE DATA (Now with French Support!) ---
 voice_data = {
     "English (US)": ["en-US-AvaNeural", "en-US-GuyNeural", "en-US-EmmaNeural", "en-US-BrianNeural"],
     "English (UK)": ["en-GB-SoniaNeural", "en-GB-RyanNeural"],
     "Spanish": ["es-MX-DaliaNeural", "es-MX-JorgeNeural", "es-ES-AlvaroNeural", "es-US-AlonsoNeural"],
+    "French": ["fr-FR-DeniseNeural", "fr-FR-HenriNeural", "fr-CA-SylvieNeural"],
 }
 
 # --- 5. SIDEBAR ---
@@ -116,7 +117,7 @@ if uploaded_file and 'full_text' in locals() and full_text:
         
         async def convert_chunk(index, text):
             filename = f"part_{index}.mp3"
-            if "Spanish" in selected_lang:
+            if "Spanish" in selected_lang or "French" in selected_lang:
                 await asyncio.sleep(index * 0.6) 
             
             try:
@@ -168,7 +169,7 @@ PDF to Voice Pro is a lightweight, high-performance web utility built for studen
 st.markdown("---")
 st.markdown("""
 ### 🛠️ Frequently Asked Questions
-**Does this translate my PDF?** No. This tool reads the text as written. If your PDF is in Spanish, select a Spanish voice!
+**Does this translate my PDF?** No. This tool reads the text as written. If your PDF is in Spanish or French, select the matching language variant!
 
 **What is the character limit?** The engine is optimized for documents under 50,000 characters.
 
