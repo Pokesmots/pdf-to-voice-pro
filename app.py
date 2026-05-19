@@ -211,3 +211,6 @@ footer_html = """
     </style>
     <div class="footer">
         <p>PDF to Voice Pro | <strong>Stop Reading. Start Listening.</strong></p>
+    </div>
+"""
+st.markdown(footer_html, unsafe_allow_html=True)
