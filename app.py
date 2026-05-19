@@ -65,9 +65,25 @@ voice_data = {
     "French": ["fr-FR-DeniseNeural", "fr-FR-HenriNeural", "fr-CA-SylvieNeural"],
 }
 
-# --- 5. MAIN HEADER ---
-st.title("🎙️ PDF to Voice Pro")
-st.subheader("Convert your documents into high-quality, audible study guides.")
+# --- 5. MAIN HEADER & TASTEFUL SUPPORT DONATION BUTTON ---
+header_col1, header_col2 = st.columns([3, 1])
+
+with header_col1:
+    st.title("🎙️ PDF to Voice Pro")
+    st.subheader("Convert your documents into high-quality, audible study guides.")
+
+with header_col2:
+    # Right-aligned floating widget container for Buy Me a Coffee HTML code
+    st.write("<div style='text-align: right; margin-top: 15px;'>", unsafe_allow_html=True)
+    bmc_button = """
+    <a href="https://www.buymeacoffee.com/escapetheordinary" target="_blank">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+        alt="Buy Me A Coffee" style="height: 45px !important; width: 162px !important; box-shadow: 0px 4px 10px rgba(0,0,0,0.3); border-radius: 6px;" >
+    </a>
+    """
+    st.markdown(bmc_button, unsafe_allow_html=True)
+    st.write("</div>", unsafe_allow_html=True)
+
 st.divider()
 
 # --- 6. CORE SYSTEM CONFIGURATION (No Sidebar, Guaranteed Visible) ---
