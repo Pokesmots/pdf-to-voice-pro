@@ -25,7 +25,7 @@ ga_code = """
 """
 components.html(ga_code, height=0)
 
-# --- 3. CUSTOM STYLING (Modern UI Layout & Visible Sidebar Toggle) ---
+# --- 3. CUSTOM STYLING (Modern UI Layout & High-Visibility Floating Toggle) ---
 st.markdown("""
     <style>
     .stApp { background-color: #0e1117; color: #ffffff; }
@@ -39,16 +39,27 @@ st.markdown("""
     header {visibility: hidden;}
     .stDeployButton {display:none;}
     
-    /* FORCE COLLAPSED SIDEBAR BUTTON TO BE BRIGHT AND VISIBLE */
+    /* BREAK THE BUTTON OUT OF THE HIDDEN HEADER ZONE & FORCE IT TO SHOW */
     button[data-testid="stSidebarCollapseButton"] {
         background-color: #0072ff !important;
         color: white !important;
         border-radius: 50% !important;
-        padding: 5px !important;
-        left: 10px !important;
-        top: 10px !important;
-        box-shadow: 0px 4px 10px rgba(0, 198, 255, 0.4) !important;
-        z-index: 999991 !important;
+        width: 45px !important;
+        height: 45px !important;
+        position: fixed !important;
+        left: 20px !important;
+        top: 20px !important;
+        box-shadow: 0px 4px 12px rgba(0, 198, 255, 0.5) !important;
+        z-index: 999999 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Make sure the internal arrow icon contrasts perfectly on the new blue background */
+    button[data-testid="stSidebarCollapseButton"] svg {
+        fill: white !important;
+        color: white !important;
     }
     
     /* Padding adjustments to ensure content doesn't get cut off by fixed footer */
@@ -203,14 +214,4 @@ footer_html = """
         color: #8a99ad;
         text-align: center;
         font-size: 14px;
-        padding: 12px;
-        font-family: sans-serif;
-        border-top: 1px solid #262730;
-        z-index: 999;
-    }
-    </style>
-    <div class="footer">
-        <p>PDF to Voice Pro | <strong>Stop Reading. Start Listening.</strong></p>
-    </div>
-"""
-st.markdown(footer_html, unsafe_allow_html=True)
+        padding:
