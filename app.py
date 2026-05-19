@@ -9,8 +9,7 @@ import os
 st.set_page_config(
     page_title="PDF to Voice Pro | Free Speechify Alternative",
     page_icon="🔊",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
 # --- 2. GOOGLE ANALYTICS (Silent Tracking) ---
@@ -25,7 +24,7 @@ ga_code = """
 """
 components.html(ga_code, height=0)
 
-# --- 3. CUSTOM STYLING (Modern UI Layout & Fixed Controls) ---
+# --- 3. CUSTOM STYLING (Modern Dark Theme UI) ---
 st.markdown("""
     <style>
     .stApp { background-color: #0e1117; color: #ffffff; }
@@ -39,11 +38,13 @@ st.markdown("""
     header {visibility: hidden;}
     .stDeployButton {display:none;}
     
-    /* Ensure default toggle button remains visible if viewport opens it */
-    button[data-testid="stSidebarCollapseButton"] {
-        background-color: #0072ff !important;
-        color: white !important;
-        border-radius: 50% !important;
+    /* Clean container look for the settings box */
+    .settings-box {
+        background-color: #1e222b;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #262730;
+        margin-bottom: 25px;
     }
     
     /* Padding adjustments to ensure content doesn't get cut off by fixed footer */
@@ -64,24 +65,24 @@ voice_data = {
     "French": ["fr-FR-DeniseNeural", "fr-FR-HenriNeural", "fr-CA-SylvieNeural"],
 }
 
-# --- 5. TOP PANEL / FALLBACK SYSTEM SETTINGS ---
-# This brings the controls front and center so mobile or small-screen users never lose them
+# --- 5. MAIN HEADER ---
 st.title("🎙️ PDF to Voice Pro")
 st.subheader("Convert your documents into high-quality, audible study guides.")
+st.divider()
 
-st.markdown("### ⚙️ System Settings")
+# --- 6. CORE SYSTEM CONFIGURATION (No Sidebar, Guaranteed Visible) ---
+st.markdown("### ⚙️ System Configuration")
 voice_col1, voice_col2 = st.columns(2)
 
 with voice_col1:
-    selected_lang = st.selectbox("Select Language", list(voice_data.keys()), key="main_lang")
+    selected_lang = st.selectbox("Select Target Language", list(voice_data.keys()))
 with voice_col2:
-    selected_voice = st.selectbox("Select Voice Talent", voice_data[selected_lang], key="main_voice")
+    selected_voice = st.selectbox("Select AI Voice Talent", voice_data[selected_lang])
 
 st.info("💡 Pro Tip: Male voices often sound best at 1.2x speed for dense study notes.")
-
 st.divider()
 
-# --- 6. MAIN INTERFACE (FILE MANAGEMENT) ---
+# --- 7. FILE MANAGEMENT & MANAGEMENT UTILITIES ---
 col1, col2 = st.columns([1, 1])
 
 with col1:
@@ -100,7 +101,7 @@ with col2:
 
 st.divider()
 
-# --- 7. THE TURBO CHUNKER ENGINE ---
+# --- 8. THE TURBO CHUNKER ENGINE ---
 if uploaded_file and 'full_text' in locals() and full_text:
     st.markdown("### 🔊 3. Audio Generation")
     if st.button("🚀 Generate High-Speed MP3"):
@@ -146,7 +147,7 @@ if uploaded_file and 'full_text' in locals() and full_text:
             except Exception as e:
                 st.error(f"Error during generation: {e}")
 
-# --- 8. SEO ADVANTAGE TEXT SECTION ---
+# --- 9. SEO ADVANTAGE TEXT SECTION ---
 st.markdown("---")
 st.markdown("### 🚀 Why Choose a Free Browser-Based TTS?")
 st.markdown("""
@@ -158,7 +159,7 @@ PDF to Voice Pro is a lightweight, high-performance web utility built for studen
 * **Completely Free Access:** No hidden microtransactions, no predatory 'free trials' that automatically charge your card, and zero software installation required.
 """)
 
-# --- 9. STANDARD FAQ ---
+# --- 10. STANDARD FAQ ---
 st.markdown("---")
 st.markdown("""
 ### 🛠️ Frequently Asked Questions
@@ -172,7 +173,7 @@ st.markdown("""
 st.caption("PDF to Voice Pro | High-Performance AI Utility | 2026")
 st.markdown('</div>', unsafe_allow_html=True) # End main-content container
 
-# --- 10. FIXED BRANDED FOOTER ---
+# --- 11. FIXED BRANDED FOOTER ---
 footer_html = """
     <style>
     .footer {
