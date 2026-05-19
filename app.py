@@ -214,4 +214,14 @@ footer_html = """
         color: #8a99ad;
         text-align: center;
         font-size: 14px;
-        padding:
+        padding: 12px;
+        font-family: sans-serif;
+        border-top: 1px solid #262730;
+        z-index: 999;
+    }
+    </style>
+    <div class="footer">
+        <p>PDF to Voice Pro | <strong>Stop Reading. Start Listening.</strong></p>
+    </div>
+"""
+st.markdown(footer_html, unsafe_allow_html=True)
