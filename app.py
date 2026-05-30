@@ -2,6 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 import os
 import re
+from pypdf import PdfReader
 import edge_tts
 import asyncio
 
@@ -65,14 +66,14 @@ st.markdown('<div class="main-content">', unsafe_allow_html=True)
 # SECTION 2: AUDIO PROCESSING HELPER FUNCTIONS
 # ==============================================================================
 def clean_extracted_text(text):
-    """Cleans whitespace and structural formatting from extracted text blocks."""
+    """Cleans whitespace and basic formatting layout anomalies."""
     if not text:
         return ""
     text = re.sub(r'\s+', ' ', text)
     text = re.sub(r'(?<=\s)[•*-]\s+', '', text)
     return text.strip()
 
-def split_text_into_chunks(text, max_chars=3000):
+def split_text_into_chunks(text, max_chars=2500):
     """Splits text intelligently at sentence boundaries to respect API payload limits."""
     if not text:
         return []
@@ -151,29 +152,12 @@ if uploaded_file is not None:
         full_raw_text = uploaded_file.read().decode("utf-8", errors="ignore")
     else:
         try:
-            raw_bytes = uploaded_file.read()
-            
-            # Robust native fallback to parse clear text strings out of uncompressed layout blocks safely
-            extracted_segments = []
-            # Scans for content wrapped cleanly inside text container parentheses b'(' and b')'
-            found_strings = re.findall(b'\\(([^)]*)\\)', raw_bytes)
-            
-            for s in found_strings:
-                try:
-                    decoded_str = s.decode('utf-8', errors='ignore').strip()
-                    # Keep valid narrative words while discarding standalone code symbols or page layout macros
-                    if len(decoded_str) > 2 and not decoded_str.startswith('/') and not decoded_str.startswith('\\'):
-                        extracted_segments.append(decoded_str)
-                except Exception:
-                    continue
-            
-            full_raw_text = " ".join(extracted_segments)
-            
-            # Secondary catch if the document structure handles text streams without traditional structural containers
-            if len(full_raw_text).strip() < 20:
-                plain_strings = re.findall(b"[a-zA-Z0-9\s\.\,\!\?\:\;\-\(\)\'\"\`]{12,}", raw_bytes)
-                full_raw_text = " ".join([item.decode('utf-8', errors='ignore') for item in plain_strings if not item.startswith(b'/')])
-                
+            pdf_reader = PdfReader(uploaded_file)
+            total_pages = len(pdf_reader.pages)
+            for page_num in range(total_pages):
+                page_text = pdf_reader.pages[page_num].extract_text()
+                if page_text:
+                    full_raw_text += page_text + " "
         except Exception as e:
             st.error(f"Error parsing content structure: {e}")
 
@@ -185,7 +169,7 @@ if uploaded_file is not None:
     else:
         st.metric(label="Total Processable Characters", value=f"{total_chars:,}")
         
-        text_chunks = split_text_into_chunks(cleaned_text, max_chars=3000)
+        text_chunks = split_text_into_chunks(cleaned_text, max_chars=2500)
         total_chunks = len(text_chunks)
         
         st.markdown("### ⚡ 3. Compile Master Audio File")
