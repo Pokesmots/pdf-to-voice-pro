@@ -3,6 +3,7 @@ import streamlit.components.v1 as components
 import os
 import re
 import subprocess
+import pdfplumber
 
 # ==============================================================================
 # SECTION 1: APP CONFIGURATION, SEO & TRACKING
@@ -64,7 +65,7 @@ st.markdown('<div class="main-content">', unsafe_allow_html=True)
 # SECTION 2: AUDIO PROCESSING HELPER FUNCTIONS
 # ==============================================================================
 def clean_extracted_text(text):
-    """Cleans whitespace and flattens formatting noise layout anomalies."""
+    """Cleans whitespace and basic formatting anomalies."""
     if not text:
         return ""
     text = re.sub(r'\s+', ' ', text)
@@ -98,8 +99,8 @@ def split_text_into_chunks(text, max_chars=2000):
 
 def generate_chunk_audio_via_cli(text, voice_id, output_path):
     """Executes the voice generation directly via system subprocess to completely bypass asyncio errors."""
-    # Strip quotes entirely to ensure shell terminal safety
-    sanitized_text = text.replace('"', '').replace("'", "").replace('$', '').replace('`', '')
+    # Clean out quotes and symbols to keep the command line string completely safe
+    sanitized_text = text.replace('"', '').replace("'", "").replace('$', '').replace('`', '').replace('\\', '')
     command = f'edge-tts --voice {voice_id} --text "{sanitized_text}" --write-media {output_path}'
     
     # Run natively on the underlying linux server engine
@@ -154,10 +155,14 @@ if uploaded_file is not None:
         full_raw_text = uploaded_file.read().decode("utf-8", errors="ignore")
     else:
         try:
-            raw_bytes = uploaded_file.read()
-            # Fast raw layout binary text string extraction logic
-            plain_strings = re.findall(b"[a-zA-Z0-9\s\.\,\!\?]{12,}", raw_bytes)
-            full_raw_text = " ".join([item.decode('utf-8', errors='ignore') for item in plain_strings if not item.startswith(b'/')])
+            # Open the file using pdfplumber to get only the actual text layout layers
+            with pdfplumber.open(uploaded_file) as pdf:
+                extracted_pages = []
+                for page in pdf.pages:
+                    text = page.extract_text()
+                    if text:
+                        extracted_pages.append(text)
+                full_raw_text = " ".join(extracted_pages)
         except Exception as e:
             st.error(f"Error parsing content structure: {e}")
 
