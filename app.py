@@ -64,7 +64,7 @@ st.markdown('<div class="main-content">', unsafe_allow_html=True)
 # SECTION 2: AUDIO PROCESSING HELPER FUNCTIONS
 # ==============================================================================
 def clean_extracted_text(text):
-    """Cleans whitespace and basic formatting layout anomalies."""
+    """Cleans whitespace and flattens formatting noise layout anomalies."""
     if not text:
         return ""
     text = re.sub(r'\s+', ' ', text)
@@ -99,7 +99,7 @@ def split_text_into_chunks(text, max_chars=2000):
 def generate_chunk_audio_via_cli(text, voice_id, output_path):
     """Executes the voice generation directly via system subprocess to completely bypass asyncio errors."""
     # Strip quotes entirely to ensure shell terminal safety
-    sanitized_text = text.replace('"', '').replace("'", "")
+    sanitized_text = text.replace('"', '').replace("'", "").replace('$', '').replace('`', '')
     command = f'edge-tts --voice {voice_id} --text "{sanitized_text}" --write-media {output_path}'
     
     # Run natively on the underlying linux server engine
@@ -155,8 +155,8 @@ if uploaded_file is not None:
     else:
         try:
             raw_bytes = uploaded_file.read()
-            # Fast raw layout binary string regex parser
-            plain_strings = re.findall(b"[a-zA-Z0-9\s\.\,\!\?\:\;\-\(\)\`]{12,}", raw_bytes)
+            # Fast raw layout binary text string extraction logic
+            plain_strings = re.findall(b"[a-zA-Z0-9\s\.\,\!\?]{12,}", raw_bytes)
             full_raw_text = " ".join([item.decode('utf-8', errors='ignore') for item in plain_strings if not item.startswith(b'/')])
         except Exception as e:
             st.error(f"Error parsing content structure: {e}")
