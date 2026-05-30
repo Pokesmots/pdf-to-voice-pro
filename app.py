@@ -65,15 +65,17 @@ st.markdown('<div class="main-content">', unsafe_allow_html=True)
 # SECTION 2: AUDIO PROCESSING HELPER FUNCTIONS
 # ==============================================================================
 def clean_extracted_text(text):
-    """Cleans whitespace, line breaks, and formatting from document text."""
+    """Cleans whitespace, structural parameters, and line formatting."""
     if not text:
         return ""
+    # Remove remaining PDF operator fragments securely
+    text = re.sub(r'\/[A-Za-z0-9]+|\b[0-9]+\s+[0-9]+\s+obj\b|\bendobj\b', '', text)
     text = re.sub(r'\s+', ' ', text)
     text = re.sub(r'(?<=\s)[•*-]\s+', '', text)
     return text.strip()
 
-def split_text_into_chunks(text, max_chars=3500):
-    """Splits text intelligently into larger chunks to avoid Streamlit connection timeouts."""
+def split_text_into_chunks(text, max_chars=3000):
+    """Splits text intelligently at sentence boundaries to respect API payload limits."""
     if not text:
         return []
     
@@ -152,25 +154,45 @@ if uploaded_file is not None:
     else:
         try:
             raw_bytes = uploaded_file.read()
-            strings = re.findall(b"[a-zA-Z0-9\s\.\,\!\?\:\;\-\(\)\'\"\`]{4,}", raw_bytes)
-            full_raw_text = " ".join([s.decode('utf-8', errors='ignore') for s in strings])
+            # Isolates actual text blocks wrapped within PDF text operators BT (Begin Text) and ET (End Text)
+            text_blocks = re.findall(b'BT[\s\S]*?ET', raw_bytes)
+            
+            extracted_segments = []
+            for block in text_blocks:
+                # Target clean alphanumeric content strings inside PDF text layout arrays
+                strings = re.findall(b'\((.*?)\)', block)
+                for s in strings:
+                    try:
+                        decoded_str = s.decode('utf-8', errors='ignore')
+                        # Exclude structural design commands and system single character flags
+                        if len(decoded_str).strip() > 2 and not decoded_str.startswith('/'):
+                            extracted_segments.append(decoded_str)
+                    except Exception:
+                        continue
+            
+            full_raw_text = " ".join(extracted_segments)
+            
+            # Fallback text parsing route if the PDF uses an uncompressed, flat string layout structure
+            if len(full_raw_text).strip() < 20:
+                plain_strings = re.findall(b"[a-zA-Z0-9\s\.\,\!\?\:\;\-\(\)\'\"\`]{12,}", raw_bytes)
+                full_raw_text = " ".join([s.decode('utf-8', errors='ignore') for s in plain_strings if not s.startswith(b'/')])
+                
         except Exception as e:
-            st.error(f"Error parsing raw content structure: {e}")
+            st.error(f"Error parsing content structure: {e}")
 
     cleaned_text = clean_extracted_text(full_raw_text)
     total_chars = len(cleaned_text)
     
     if total_chars < 10:
-        st.error("Could not parse enough structural text from this document. If this is a scanned PDF image, please copy-paste the text directly into a .txt file and upload it here!")
+        st.error("Could not parse enough clear text from this document layout. If this is a graphical image PDF, please try uploading a text file instead!")
     else:
         st.metric(label="Total Processable Characters", value=f"{total_chars:,}")
         
-        # Split using the updated, high-capacity chunk limit
-        text_chunks = split_text_into_chunks(cleaned_text, max_chars=3500)
+        text_chunks = split_text_into_chunks(cleaned_text, max_chars=3000)
         total_chunks = len(text_chunks)
         
         st.markdown("### ⚡ 3. Compile Master Audio File")
-        st.write(f"The text has been formatted into **{total_chunks} accelerated packets** to protect system runtime bounds.")
+        st.write(f"The text has been formatted into **{total_chunks} optimized chunks** for high-speed streaming processing.")
         
         if st.button("Generate MP3 Audio Guide"):
             progress_bar = st.progress(0)
@@ -180,14 +202,13 @@ if uploaded_file is not None:
             compiled_success = True
             
             for i, chunk in enumerate(text_chunks):
-                status_text.write(f"Processing batch packet **{i+1}/{total_chunks}**...")
+                status_text.write(f"Processing audio packet **{i+1}/{total_chunks}**...")
                 temp_filename = f"chunk_{i}.mp3"
                 
                 try:
                     asyncio.run(generate_chunk_audio(chunk, selected_voice_id, temp_filename))
                     chunk_files.append(temp_filename)
-                    # Safe background yield to prevent server stream disconnects
-                    asyncio.run(asyncio.sleep(0.1))
+                    asyncio.run(asyncio.sleep(0.05))
                 except Exception as e:
                     st.error(f"Processing error on fragment {i+1}: {str(e)}")
                     compiled_success = False
