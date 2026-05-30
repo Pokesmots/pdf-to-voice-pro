@@ -270,3 +270,59 @@ with gear_col3:
     st.markdown("""
     <div class="gear-card">
         <div>
+            <span style="font-size: 32px;">💻</span>
+            <h4 style="margin: 10px 0; color: #00c6ff;">Lamicall Foldable Stand</h4>
+            <p style="font-size: 13px; color: #8a99ad; line-height: 1.4;">Premium adjustable aluminum laptop and tablet stand. Folds flat to fit in your backpack for a perfectly ergonomic study setup anywhere.</p>
+        </div>
+        <a href="https://amzn.to/3PwJ3Ad" target="_blank" style="display: block; background: #FF9900; color: #111; padding: 10px; border-radius: 5px; font-weight: bold; text-decoration: none; font-size: 14px;">View Deal on Amazon ➔</a>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ==============================================================================
+# SECTION 8: SEO LONG-TAIL MARKETING CONTENT
+# ==============================================================================
+st.write("---")
+st.markdown("### 🚀 Why Choose a Free Browser-Based TTS?")
+st.markdown("""
+Looking for a secure **free Speechify alternative**, a way to read research papers aloud, or a tool to listen to documents without an **ElevenReader or Paper2Audio subscription** limit? 
+PDF to Voice Pro is a lightweight, high-performance web utility built for students, academics, commuters, and professionals who need to convert dense textbooks, research papers, and study guides to audio on the fly. 
+
+* **No Subscriptions, No 56-Hour Limits:** Unlike premium platforms, there are no recurring monthly credit resets, weekly hour caps, or aggressive paywalls standing between you and your learning.
+* **Intelligent Local Processing:** Your security matters. Files are processed entirely inside your local browser memory—no private text, academic research, or corporate data is ever saved to external database servers.
+* **Completely Free Access:** No hidden microtransactions, no predatory 'free trials' that automatically charge your card, and zero software or browser extensions required.
+""")
+
+st.write("---")
+st.markdown("""
+### 🛠️ Frequently Asked Questions
+**Does this translate my PDF?** No. This tool reads the text as written. If your PDF is in Spanish or French, select the matching language variant!
+**What is the character limit?** The engine is optimized for documents under 50,000 characters.
+**Is my data safe?** Yes. We use volatile processing; your files are cleared the moment you close the tab. We use basic Google Analytics to see how many people use the tool, but we never see your PDFs.
+""")
+
+st.caption("PDF to Voice Pro | High-Performance AI Utility | 2026")
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ==============================================================================
+# SECTION 9: FIXED BRANDED FOOTER & COMMUNITY SUPPORT LINKS
+# ==============================================================================
+footer_html = """
+    <style>
+    .footer {
+        position: fixed; left: 0; bottom: 0; width: 100%;
+        background-color: rgba(14, 17, 23, 0.98); color: #8a99ad;
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 40px; font-family: sans-serif; font-size: 14px;
+        border-top: 1px solid #262730; z-index: 999; box-sizing: border-box;
+    }
+    .footer-text { margin: 0; }
+    .footer-btn { height: 36px !important; width: 129px !important; }
+    </style>
+    <div class="footer">
+        <p class="footer-text">PDF to Voice Pro | <strong>Stop Reading. Start Listening.</strong></p>
+        <a href="https://www.buymeacoffee.com/escapetheordinary" target="_blank">
+            <img class="footer-btn" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
+        </a>
+    </div>
+"""
+st.markdown(footer_html, unsafe_allow_html=True)
