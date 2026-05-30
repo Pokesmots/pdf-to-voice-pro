@@ -190,25 +190,25 @@ if uploaded_file is not None:
             chunk_files = []
             compiled_success = True
             
-            # Secure nested loop execution workaround for Streamlit environment architecture
-            try:
-                loop = asyncio.get_running_loop()
-            except RuntimeError:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-            
+            # Isolated synchronous thread orchestrator to bypass active loop block errors permanently
+            def run_async_task(coro):
+                try:
+                    return asyncio.run(coro)
+                except RuntimeError:
+                    new_loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(new_loop)
+                    try:
+                        return new_loop.run_until_complete(coro)
+                    finally:
+                        new_loop.close()
+
             for i, chunk in enumerate(text_chunks):
                 status_text.write(f"Processing audio packet **{i+1}/{total_chunks}**...")
                 temp_filename = f"chunk_{i}.mp3"
                 
                 try:
-                    # Run the async functions smoothly within Streamlit's running loop container
-                    if loop.is_running():
-                        future = asyncio.run_coroutine_threadsafe(generate_chunk_audio(chunk, selected_voice_id, temp_filename), loop)
-                        future.result()  # Wait for chunk to finish generating
-                    else:
-                        loop.run_until_complete(generate_chunk_audio(chunk, selected_voice_id, temp_filename))
-                        
+                    # Execute generation in a safely isolated environment
+                    run_async_task(generate_chunk_audio(chunk, selected_voice_id, temp_filename))
                     chunk_files.append(temp_filename)
                 except Exception as e:
                     st.error(f"Processing error on fragment {i+1}: {str(e)}")
