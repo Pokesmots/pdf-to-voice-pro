@@ -2,9 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 import os
 import re
-from pypdf import PdfReader
-import edge_tts
-import asyncio
+import subprocess
 
 # ==============================================================================
 # SECTION 1: APP CONFIGURATION, SEO & TRACKING
@@ -73,8 +71,8 @@ def clean_extracted_text(text):
     text = re.sub(r'(?<=\s)[•*-]\s+', '', text)
     return text.strip()
 
-def split_text_into_chunks(text, max_chars=2500):
-    """Splits text intelligently at sentence boundaries to respect API payload limits."""
+def split_text_into_chunks(text, max_chars=2000):
+    """Splits text intelligently at sentence boundaries to respect CLI argument limits."""
     if not text:
         return []
     
@@ -98,10 +96,14 @@ def split_text_into_chunks(text, max_chars=2500):
         
     return chunks
 
-async def generate_chunk_audio(text, voice_id, output_path):
-    """Asynchronously generates an MP3 file for a single text chunk."""
-    communicate = edge_tts.Communicate(text, voice_id)
-    await communicate.save(output_path)
+def generate_chunk_audio_via_cli(text, voice_id, output_path):
+    """Executes the voice generation directly via system subprocess to completely bypass asyncio errors."""
+    # Strip quotes entirely to ensure shell terminal safety
+    sanitized_text = text.replace('"', '').replace("'", "")
+    command = f'edge-tts --voice {voice_id} --text "{sanitized_text}" --write-media {output_path}'
+    
+    # Run natively on the underlying linux server engine
+    subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 # ==============================================================================
 # SECTION 3: HEADER & APP INTRODUCTION
@@ -152,20 +154,10 @@ if uploaded_file is not None:
         full_raw_text = uploaded_file.read().decode("utf-8", errors="ignore")
     else:
         try:
-            pdf_reader = PdfReader(uploaded_file)
-            total_pages = len(pdf_reader.pages)
-            for page_num in range(total_pages):
-                page_text = pdf_reader.pages[page_num].extract_text()
-                if page_text:
-                    full_raw_text += page_text + " "
-                    
-            # Native fallback parser if standard extraction comes up empty
-            if len(full_raw_text).strip() < 20:
-                uploaded_file.seek(0)
-                raw_bytes = uploaded_file.read()
-                plain_strings = re.findall(b"[a-zA-Z0-9\s\.\,\!\?\:\;\-\(\)\'\"\`]{12,}", raw_bytes)
-                full_raw_text = " ".join([item.decode('utf-8', errors='ignore') for item in plain_strings if not item.startswith(b'/')])
-                
+            raw_bytes = uploaded_file.read()
+            # Fast raw layout binary string regex parser
+            plain_strings = re.findall(b"[a-zA-Z0-9\s\.\,\!\?\:\;\-\(\)\`]{12,}", raw_bytes)
+            full_raw_text = " ".join([item.decode('utf-8', errors='ignore') for item in plain_strings if not item.startswith(b'/')])
         except Exception as e:
             st.error(f"Error parsing content structure: {e}")
 
@@ -173,11 +165,11 @@ if uploaded_file is not None:
     total_chars = len(cleaned_text)
     
     if total_chars < 10:
-        st.error("Could not parse enough clear text from this document layout. If this is a graphical image PDF, please try uploading a text file instead!")
+        st.error("Could not parse enough clear text from this document layout. Please make sure this is a text-based document or upload a plain .txt file!")
     else:
         st.metric(label="Total Processable Characters", value=f"{total_chars:,}")
         
-        text_chunks = split_text_into_chunks(cleaned_text, max_chars=2500)
+        text_chunks = split_text_into_chunks(cleaned_text, max_chars=2000)
         total_chunks = len(text_chunks)
         
         st.markdown("### ⚡ 3. Compile Master Audio File")
@@ -190,26 +182,17 @@ if uploaded_file is not None:
             chunk_files = []
             compiled_success = True
             
-            # Isolated synchronous thread orchestrator to bypass active loop block errors permanently
-            def run_async_task(coro):
-                try:
-                    return asyncio.run(coro)
-                except RuntimeError:
-                    new_loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(new_loop)
-                    try:
-                        return new_loop.run_until_complete(coro)
-                    finally:
-                        new_loop.close()
-
             for i, chunk in enumerate(text_chunks):
                 status_text.write(f"Processing audio packet **{i+1}/{total_chunks}**...")
                 temp_filename = f"chunk_{i}.mp3"
                 
                 try:
-                    # Execute generation in a safely isolated environment
-                    run_async_task(generate_chunk_audio(chunk, selected_voice_id, temp_filename))
-                    chunk_files.append(temp_filename)
+                    # Run via direct background CLI execution call
+                    generate_chunk_audio_via_cli(chunk, selected_voice_id, temp_filename)
+                    if os.path.exists(temp_filename):
+                        chunk_files.append(temp_filename)
+                    else:
+                        raise FileNotFoundError("Audio segment file production drop failure.")
                 except Exception as e:
                     st.error(f"Processing error on fragment {i+1}: {str(e)}")
                     compiled_success = False
@@ -287,59 +270,3 @@ with gear_col3:
     st.markdown("""
     <div class="gear-card">
         <div>
-            <span style="font-size: 32px;">💻</span>
-            <h4 style="margin: 10px 0; color: #00c6ff;">Lamicall Foldable Stand</h4>
-            <p style="font-size: 13px; color: #8a99ad; line-height: 1.4;">Premium adjustable aluminum laptop and tablet stand. Folds flat to fit in your backpack for a perfectly ergonomic study setup anywhere.</p>
-        </div>
-        <a href="https://amzn.to/3PwJ3Ad" target="_blank" style="display: block; background: #FF9900; color: #111; padding: 10px; border-radius: 5px; font-weight: bold; text-decoration: none; font-size: 14px;">View Deal on Amazon ➔</a>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ==============================================================================
-# SECTION 8: SEO LONG-TAIL MARKETING CONTENT
-# ==============================================================================
-st.write("---")
-st.markdown("### 🚀 Why Choose a Free Browser-Based TTS?")
-st.markdown("""
-Looking for a secure **free Speechify alternative**, a way to read research papers aloud, or a tool to listen to documents without an **ElevenReader or Paper2Audio subscription** limit? 
-PDF to Voice Pro is a lightweight, high-performance web utility built for students, academics, commuters, and professionals who need to convert dense textbooks, research papers, and study guides to audio on the fly. 
-
-* **No Subscriptions, No 56-Hour Limits:** Unlike premium platforms, there are no recurring monthly credit resets, weekly hour caps, or aggressive paywalls standing between you and your learning.
-* **Intelligent Local Processing:** Your security matters. Files are processed entirely inside your local browser memory—no private text, academic research, or corporate data is ever saved to external database servers.
-* **Completely Free Access:** No hidden microtransactions, no predatory 'free trials' that automatically charge your card, and zero software or browser extensions required.
-""")
-
-st.write("---")
-st.markdown("""
-### 🛠️ Frequently Asked Questions
-**Does this translate my PDF?** No. This tool reads the text as written. If your PDF is in Spanish or French, select the matching language variant!
-**What is the character limit?** The engine is optimized for documents under 50,000 characters.
-**Is my data safe?** Yes. We use volatile processing; your files are cleared the moment you close the tab. We use basic Google Analytics to see how many people use the tool, but we never see your PDFs.
-""")
-
-st.caption("PDF to Voice Pro | High-Performance AI Utility | 2026")
-st.markdown('</div>', unsafe_allow_html=True)
-
-# ==============================================================================
-# SECTION 9: FIXED BRANDED FOOTER & COMMUNITY SUPPORT LINKS
-# ==============================================================================
-footer_html = """
-    <style>
-    .footer {
-        position: fixed; left: 0; bottom: 0; width: 100%;
-        background-color: rgba(14, 17, 23, 0.98); color: #8a99ad;
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 10px 40px; font-family: sans-serif; font-size: 14px;
-        border-top: 1px solid #262730; z-index: 999; box-sizing: border-box;
-    }
-    .footer-text { margin: 0; }
-    .footer-btn { height: 36px !important; width: 129px !important; }
-    </style>
-    <div class="footer">
-        <p class="footer-text">PDF to Voice Pro | <strong>Stop Reading. Start Listening.</strong></p>
-        <a href="https://www.buymeacoffee.com/escapetheordinary" target="_blank">
-            <img class="footer-btn" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
-        </a>
-    </div>
-"""
-st.markdown(footer_html, unsafe_allow_html=True)
