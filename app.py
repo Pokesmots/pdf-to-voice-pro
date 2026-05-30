@@ -72,8 +72,8 @@ def clean_extracted_text(text):
     text = re.sub(r'(?<=\s)[•*-]\s+', '', text)
     return text.strip()
 
-def split_text_into_chunks(text, max_chars=1500):
-    """Splits text intelligently at sentence boundaries to respect API payload limits."""
+def split_text_into_chunks(text, max_chars=3500):
+    """Splits text intelligently into larger chunks to avoid Streamlit connection timeouts."""
     if not text:
         return []
     
@@ -150,10 +150,8 @@ if uploaded_file is not None:
     if uploaded_file.name.endswith('.txt'):
         full_raw_text = uploaded_file.read().decode("utf-8", errors="ignore")
     else:
-        # Native byte stream extraction to parse text strings from PDF containers safely
         try:
             raw_bytes = uploaded_file.read()
-            # Grabs alphanumeric strings and common punctuation marks
             strings = re.findall(b"[a-zA-Z0-9\s\.\,\!\?\:\;\-\(\)\'\"\`]{4,}", raw_bytes)
             full_raw_text = " ".join([s.decode('utf-8', errors='ignore') for s in strings])
         except Exception as e:
@@ -167,11 +165,12 @@ if uploaded_file is not None:
     else:
         st.metric(label="Total Processable Characters", value=f"{total_chars:,}")
         
-        text_chunks = split_text_into_chunks(cleaned_text, max_chars=1800)
+        # Split using the updated, high-capacity chunk limit
+        text_chunks = split_text_into_chunks(cleaned_text, max_chars=3500)
         total_chunks = len(text_chunks)
         
         st.markdown("### ⚡ 3. Compile Master Audio File")
-        st.write(f"The text has been formatted into **{total_chunks} optimized chunks** for high-speed streaming processing.")
+        st.write(f"The text has been formatted into **{total_chunks} accelerated packets** to protect system runtime bounds.")
         
         if st.button("Generate MP3 Audio Guide"):
             progress_bar = st.progress(0)
@@ -181,12 +180,14 @@ if uploaded_file is not None:
             compiled_success = True
             
             for i, chunk in enumerate(text_chunks):
-                status_text.write(f"Processing audio packet **{i+1}/{total_chunks}**...")
+                status_text.write(f"Processing batch packet **{i+1}/{total_chunks}**...")
                 temp_filename = f"chunk_{i}.mp3"
                 
                 try:
                     asyncio.run(generate_chunk_audio(chunk, selected_voice_id, temp_filename))
                     chunk_files.append(temp_filename)
+                    # Safe background yield to prevent server stream disconnects
+                    asyncio.run(asyncio.sleep(0.1))
                 except Exception as e:
                     st.error(f"Processing error on fragment {i+1}: {str(e)}")
                     compiled_success = False
