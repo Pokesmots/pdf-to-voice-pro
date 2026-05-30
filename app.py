@@ -65,11 +65,9 @@ st.markdown('<div class="main-content">', unsafe_allow_html=True)
 # SECTION 2: AUDIO PROCESSING HELPER FUNCTIONS
 # ==============================================================================
 def clean_extracted_text(text):
-    """Cleans whitespace, structural parameters, and line formatting."""
+    """Cleans whitespace and structural formatting from extracted text blocks."""
     if not text:
         return ""
-    # Remove remaining PDF operator fragments securely
-    text = re.sub(r'\/[A-Za-z0-9]+|\b[0-9]+\s+[0-9]+\s+obj\b|\bendobj\b', '', text)
     text = re.sub(r'\s+', ' ', text)
     text = re.sub(r'(?<=\s)[•*-]\s+', '', text)
     return text.strip()
@@ -154,28 +152,27 @@ if uploaded_file is not None:
     else:
         try:
             raw_bytes = uploaded_file.read()
-            # Isolates actual text blocks wrapped within PDF text operators BT (Begin Text) and ET (End Text)
-            text_blocks = re.findall(b'BT[\s\S]*?ET', raw_bytes)
             
+            # Robust native fallback to parse clear text strings out of uncompressed layout blocks safely
             extracted_segments = []
-            for block in text_blocks:
-                # Target clean alphanumeric content strings inside PDF text layout arrays
-                strings = re.findall(b'\((.*?)\)', block)
-                for s in strings:
-                    try:
-                        decoded_str = s.decode('utf-8', errors='ignore')
-                        # Exclude structural design commands and system single character flags
-                        if len(decoded_str).strip() > 2 and not decoded_str.startswith('/'):
-                            extracted_segments.append(decoded_str)
-                    except Exception:
-                        continue
+            # Scans for content wrapped cleanly inside text container parentheses b'(' and b')'
+            found_strings = re.findall(b'\\(([^)]*)\\)', raw_bytes)
+            
+            for s in found_strings:
+                try:
+                    decoded_str = s.decode('utf-8', errors='ignore').strip()
+                    # Keep valid narrative words while discarding standalone code symbols or page layout macros
+                    if len(decoded_str) > 2 and not decoded_str.startswith('/') and not decoded_str.startswith('\\'):
+                        extracted_segments.append(decoded_str)
+                except Exception:
+                    continue
             
             full_raw_text = " ".join(extracted_segments)
             
-            # Fallback text parsing route if the PDF uses an uncompressed, flat string layout structure
+            # Secondary catch if the document structure handles text streams without traditional structural containers
             if len(full_raw_text).strip() < 20:
                 plain_strings = re.findall(b"[a-zA-Z0-9\s\.\,\!\?\:\;\-\(\)\'\"\`]{12,}", raw_bytes)
-                full_raw_text = " ".join([s.decode('utf-8', errors='ignore') for s in plain_strings if not s.startswith(b'/')])
+                full_raw_text = " ".join([item.decode('utf-8', errors='ignore') for item in plain_strings if not item.startswith(b'/')])
                 
         except Exception as e:
             st.error(f"Error parsing content structure: {e}")
