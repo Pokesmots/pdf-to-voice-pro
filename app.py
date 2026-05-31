@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import pdfplumber
+import gc
 
 # ==============================================================================
 # SECTION 1: APP CONFIGURATION, SEO & TRACKING
@@ -99,11 +100,8 @@ def split_text_into_chunks(text, max_chars=2000):
 
 def generate_chunk_audio_via_cli(text, voice_id, output_path):
     """Executes the voice generation directly via system subprocess to completely bypass asyncio errors."""
-    # Clean out quotes and symbols to keep the command line string completely safe
     sanitized_text = text.replace('"', '').replace("'", "").replace('$', '').replace('`', '').replace('\\', '')
     command = f'edge-tts --voice {voice_id} --text "{sanitized_text}" --write-media {output_path}'
-    
-    # Run natively on the underlying linux server engine
     subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 # ==============================================================================
@@ -155,19 +153,27 @@ if uploaded_file is not None:
         full_raw_text = uploaded_file.read().decode("utf-8", errors="ignore")
     else:
         try:
-            # Open the file using pdfplumber to get only the actual text layout layers
+            # Memory-Optimized Streaming Parser: Extracts page-by-page to keep RAM footprint ultra-low
             with pdfplumber.open(uploaded_file) as pdf:
                 extracted_pages = []
                 for page in pdf.pages:
                     text = page.extract_text()
                     if text:
                         extracted_pages.append(text)
+                    # Force empty layout references immediately out of cache memory
+                    page.flush_cache()
                 full_raw_text = " ".join(extracted_pages)
+                del extracted_pages
+                gc.collect()
         except Exception as e:
             st.error(f"Error parsing content structure: {e}")
 
     cleaned_text = clean_extracted_text(full_raw_text)
     total_chars = len(cleaned_text)
+    
+    # Delete the raw extraction string to save memory space immediately
+    del full_raw_text
+    gc.collect()
     
     if total_chars < 10:
         st.error("Could not parse enough clear text from this document layout. Please make sure this is a text-based document or upload a plain .txt file!")
@@ -176,6 +182,10 @@ if uploaded_file is not None:
         
         text_chunks = split_text_into_chunks(cleaned_text, max_chars=2000)
         total_chunks = len(text_chunks)
+        
+        # Clear cleaned text layout memory block after split segmentation pass
+        del cleaned_text
+        gc.collect()
         
         st.markdown("### ⚡ 3. Compile Master Audio File")
         st.write(f"The text has been formatted into **{total_chunks} optimized chunks** for high-speed streaming processing.")
@@ -192,7 +202,6 @@ if uploaded_file is not None:
                 temp_filename = f"chunk_{i}.mp3"
                 
                 try:
-                    # Run via direct background CLI execution call
                     generate_chunk_audio_via_cli(chunk, selected_voice_id, temp_filename)
                     if os.path.exists(temp_filename):
                         chunk_files.append(temp_filename)
@@ -230,11 +239,14 @@ if uploaded_file is not None:
                 except Exception as merge_error:
                     st.error(f"Error compiling master output file track assembly: {str(merge_error)}")
                 finally:
+                    # Comprehensive post-run disk and memory cleanup pass
                     for temp_file in chunk_files:
                         if os.path.exists(temp_file):
                             os.remove(temp_file)
                     if os.path.exists(master_output_filename):
                         os.remove(master_output_filename)
+                    del chunk_files
+                    gc.collect()
             else:
                 st.error("Audio conversion failed during step compilation tracking pipeline updates.")
 
