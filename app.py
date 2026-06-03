@@ -115,7 +115,7 @@ st.write("A 100% free, privacy-first open-source utility with zero subscription 
 # SECTION 4: VOICE SELECTION & LANGUAGE SETTINGS
 # ==============================================================================
 st.write("---")
-st.markdown("### ⚙️ System Configuration")
+st.markdown("### ⚙️ 1. System Configuration")
 
 AVAILABLE_VOICES = {
     "English (US) - Guy (Neural Male)": "en-US-GuyNeural",
