@@ -374,11 +374,17 @@ PDF to Voice Pro is a lightweight, high-performance web utility built specifical
 # SECTION 9: FREQUENTLY ASKED QUESTIONS & FOOTER
 # ==============================================================================
 st.write("---")
+st.markdown("### 🛠️ Frequently Asked Questions")
+
 st.markdown("""
-### 🛠️ Frequently Asked Questions
-**Does this translate my PDF?** No. This tool reads the text as written. If your PDF is in Spanish or French, select the matching language variant!
-**What is the character limit?** The engine is optimized for documents under 50,000 characters.
-**Is my data safe?** Yes. We use volatile processing; your files are cleared the moment you close the tab. We use basic Google Analytics to see how many people use the tool, but we never see your PDFs.
+**Does this translate my PDF?**  
+No. This tool reads the text as written. If your PDF is in Spanish or French, select the matching language variant!
+
+**What is the character limit?**  
+The engine is optimized for documents under 50,000 characters.
+
+**Is my data safe?**  
+Yes. We use volatile processing; your files are cleared the moment you close the tab. We use basic Google Analytics to see how many people use the tool, but we never see your PDFs.
 """)
 
 st.caption("PDF to Voice Pro | High-Performance AI Utility | 2026")
