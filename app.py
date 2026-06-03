@@ -28,81 +28,89 @@ ga_code = """
 """
 components.html(ga_code, height=0)
 
-# Custom Styling for UI elements, Hidden Headers, and Amazon Cards
+# Premium High-Contrast CSS Styling
 st.markdown("""
 <style>
-    /* Global Base Styling */
-    .stApp { background-color: #0b0d12; color: #f0f2f5; font-family: 'Inter', sans-serif; }
-    .main .block-container { max-width: 1100px; padding-top: 2.5rem; padding-bottom: 6rem; }
+    /* Global Base Dark Background */
+    .stApp { background-color: #0f172a; color: #f1f5f9; font-family: 'Inter', sans-serif; }
+    .main .block-container { max-width: 1050px; padding-top: 2.5rem; padding-bottom: 6rem; }
     
-    /* Modern Premium Hero Section Card */
+    /* Modern Premium Hero Banner */
     .hero-container {
-        background: linear-gradient(135deg, #131722 0%, #1a1f2c 100%);
-        border-left: 5px solid #00c6ff;
-        border-image: linear-gradient(to bottom, #00c6ff, #0072ff) 1;
-        padding: 30px;
-        border-radius: 4px;
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 1px solid #334155;
+        border-left: 6px solid #00c6ff;
+        padding: 32px;
+        border-radius: 12px;
         margin-bottom: 35px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
     }
     
-    /* Elegant CSS Gradient Titles */
+    /* Vibrant Left-Aligned Gradient Header Title */
     .gradient-title {
         background: linear-gradient(to right, #00c6ff, #0072ff);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 42px !important;
+        font-size: 44px !important;
         font-weight: 800 !important;
-        margin-bottom: 5px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
     }
     
-    /* Structural Step Section Framing Cards */
+    /* High-Contrast Lightened Structural Step Cards */
     .step-card {
-        background-color: #141822; 
-        padding: 25px; 
+        background-color: #1e293b; 
+        padding: 30px; 
         border-radius: 12px; 
-        border: 1px solid #22293a; 
-        margin-top: 15px;
+        border: 1px solid #475569; 
+        margin-top: 20px;
         margin-bottom: 25px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
     
-    /* Interactive Highlight Buttons */
+    /* True White Text Overrides for Clear Reading Hierarchy */
+    .step-card h3 { color: #ffffff !important; font-weight: 700 !important; margin-bottom: 15px !important; }
+    .step-card p, .step-card label { color: #f8fafc !important; font-weight: 500; }
+    
+    /* High-Visibility Custom Form Input Framing */
+    div[data-baseweb="select"] { background-color: #0f172a !important; border-radius: 8px; }
+    div[data-testid="stFileUploaderDropzone"] { background-color: #0f172a !important; border: 2px dashed #64748b !important; }
+    
+    /* Premium Action Button Customizations */
     div.stButton > button:first-child {
         background-image: linear-gradient(to right, #00c6ff, #0072ff);
-        color: white; border: none; border-radius: 10px; font-weight: bold; height: 3.4em; width: 100%;
-        box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3);
-        transition: all 0.3s ease;
+        color: white; border: none; border-radius: 10px; font-weight: bold; height: 3.5em; width: 100%;
+        box-shadow: 0 4px 18px rgba(0, 198, 255, 0.35);
+        transition: all 0.25s ease;
         font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     div.stButton > button:first-child:hover {
         background-image: linear-gradient(to right, #0072ff, #00c6ff);
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
+        box-shadow: 0 6px 22px rgba(0, 114, 255, 0.45);
     }
     
-    /* Clean System Menu Hiding Customizations */
+    /* Hide Default System Menu Wrappers cleanly */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     .stDeployButton {display:none;}
     
-    /* Amazon Product Monetization Layout Cards */
+    /* Amazon Product Card Placements */
     .main-content { padding-bottom: 80px; }
     .gear-card {
-        background-color: #141822; 
-        padding: 20px; 
-        border-radius: 10px; 
-        border: 1px solid #22293a; 
+        background-color: #1e293b; 
+        padding: 24px; 
+        border-radius: 12px; 
+        border: 1px solid #334155; 
         text-align: center; 
-        height: 290px;
+        height: 300px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -157,8 +165,8 @@ def generate_chunk_audio_via_cli(text, voice_id, output_path):
 st.markdown("""
 <div class="hero-container">
     <div class="gradient-title">🎙️ PDF to Voice Pro</div>
-    <h3 style="margin-top: 0; margin-bottom: 12px; font-weight: 500; color: #e1e7f0;">Convert your documents into high-quality, audible study guides.</h3>
-    <p style="color: #9cb0c9; margin: 0; font-size: 14px; line-height: 1.5;">A 100% free, privacy-first open-source utility with zero subscription paywalls, no character limits, and no registration required.</p>
+    <h3 style="margin-top: 0; margin-bottom: 12px; font-weight: 600; color: #ffffff;">Convert your documents into high-quality, audible study guides.</h3>
+    <p style="color: #cbd5e1; margin: 0; font-size: 15px; line-height: 1.6;">A 100% free, privacy-first open-source utility with zero subscription paywalls, no character limits, and no registration required.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -166,7 +174,7 @@ st.markdown("""
 # SECTION 4: VOICE SELECTION & LANGUAGE SETTINGS
 # ==============================================================================
 st.markdown('<div class="step-card">', unsafe_allow_html=True)
-st.markdown("<h3 style='margin-top:0; color:#00c6ff;'>⚙️ 1. System Configuration</h3>", unsafe_allow_html=True)
+st.markdown("<h3>⚙️ 1. System Configuration</h3>", unsafe_allow_html=True)
 
 AVAILABLE_VOICES = {
     "English (US) - Guy (Neural Male)": "en-US-GuyNeural",
@@ -192,7 +200,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # SECTION 5: FILE UPLOAD INTERFACE
 # ==============================================================================
 st.markdown('<div class="step-card">', unsafe_allow_html=True)
-st.markdown("<h3 style='margin-top:0; color:#00c6ff;'>📄 2. Upload Document</h3>", unsafe_allow_html=True)
+st.markdown("<h3>📄 2. Upload Document</h3>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Drag and drop your file here (Supports PDF and TXT formats)", type=["pdf", "txt"])
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -238,7 +246,7 @@ if uploaded_file is not None:
         del cleaned_text
         gc.collect()
         
-        st.markdown("<h3 style='margin-top:15px; color:#00c6ff;'>⚡ 3. Compile Master Audio File</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='margin-top:15px;'>⚡ 3. Compile Master Audio File</h3>", unsafe_allow_html=True)
         st.write(f"The text has been formatted into **{total_chunks} optimized chunks** for high-speed streaming processing.")
         
         if st.button("Generate MP3 Audio Guide"):
@@ -315,8 +323,8 @@ with gear_col1:
     <div class="gear-card">
         <div>
             <span style="font-size: 32px;">🎧</span>
-            <h4 style="margin: 10px 0; color: #00c6ff;">Soundcore by Anker Life Q30</h4>
-            <p style="font-size: 13px; color: #8a99ad; line-height: 1.4;">The absolute gold standard for budget active noise-canceling headphones. Block out loud libraries or loud traffic commutes.</p>
+            <h4 style="margin: 10px 0; color: #00c6ff; font-weight:700;">Soundcore by Anker Life Q30</h4>
+            <p style="font-size: 13px; color: #cbd5e1; line-height: 1.4;">The absolute gold standard for budget active noise-canceling headphones. Block out loud libraries or loud traffic commutes.</p>
         </div>
         <a href="https://amzn.to/4dxfJ5K" target="_blank" style="display: block; background: #FF9900; color: #111; padding: 10px; border-radius: 5px; font-weight: bold; text-decoration: none; font-size: 14px;">View Deal on Amazon ➔</a>
     </div>
@@ -327,8 +335,8 @@ with gear_col2:
     <div class="gear-card">
         <div>
             <span style="font-size: 32px;">🔋</span>
-            <h4 style="margin: 10px 0; color: #00c6ff;">Anker Prime Power Bank</h4>
-            <p style="font-size: 13px; color: #8a99ad; line-height: 1.4;">20,000mAh, 220W high-capacity portable charger. Keeps your phones or tablets fully powered up on long campus days or work shifts.</p>
+            <h4 style="margin: 10px 0; color: #00c6ff; font-weight:700;">Anker Prime Power Bank</h4>
+            <p style="font-size: 13px; color: #cbd5e1; line-height: 1.4;">20,000mAh, 220W high-capacity portable charger. Keeps your phones or tablets fully powered up on long campus days or work shifts.</p>
         </div>
         <a href="https://amzn.to/3PsFc7h" target="_blank" style="display: block; background: #FF9900; color: #111; padding: 10px; border-radius: 5px; font-weight: bold; text-decoration: none; font-size: 14px;">View Deal on Amazon ➔</a>
     </div>
@@ -339,8 +347,8 @@ with gear_col3:
     <div class="gear-card">
         <div>
             <span style="font-size: 32px;">💻</span>
-            <h4 style="margin: 10px 0; color: #00c6ff;">Lamicall Foldable Stand</h4>
-            <p style="font-size: 13px; color: #8a99ad; line-height: 1.4;">Premium adjustable aluminum laptop and tablet stand. Folds flat to fit in your backpack for a perfectly ergonomic study setup anywhere.</p>
+            <h4 style="margin: 10px 0; color: #00c6ff; font-weight:700;">Lamicall Foldable Stand</h4>
+            <p style="font-size: 13px; color: #cbd5e1; line-height: 1.4;">Premium adjustable aluminum laptop and tablet stand. Folds flat to fit in your backpack for a perfectly ergonomic study setup anywhere.</p>
         </div>
         <a href="https://amzn.to/3PwJ3Ad" target="_blank" style="display: block; background: #FF9900; color: #111; padding: 10px; border-radius: 5px; font-weight: bold; text-decoration: none; font-size: 14px;">View Deal on Amazon ➔</a>
     </div>
@@ -380,12 +388,12 @@ footer_html = """
     <style>
     .footer {
         position: fixed; left: 0; bottom: 0; width: 100%;
-        background-color: rgba(11, 13, 18, 0.98); color: #8a99ad;
+        background-color: rgba(30, 41, 59, 0.98); color: #cbd5e1;
         display: flex; justify-content: space-between; align-items: center;
-        padding: 10px 40px; font-family: sans-serif; font-size: 14px;
-        border-top: 1px solid #22293a; z-index: 999; box-sizing: border-box;
+        padding: 12px 40px; font-family: sans-serif; font-size: 14px;
+        border-top: 1px solid #475569; z-index: 999; box-sizing: border-box;
     }
-    .footer-text { margin: 0; }
+    .footer-text { margin: 0; font-weight: 500; }
     .footer-btn { height: 36px !important; width: 129px !important; }
     </style>
     <div class="footer">
