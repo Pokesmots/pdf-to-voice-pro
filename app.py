@@ -31,31 +31,78 @@ components.html(ga_code, height=0)
 # Custom Styling for UI elements, Hidden Headers, and Amazon Cards
 st.markdown("""
 <style>
-    .stApp { background-color: #0e1117; color: #ffffff; }
-    .main .block-container { max-width: 1200px; padding-top: 2rem; }
+    /* Global Base Styling */
+    .stApp { background-color: #0b0d12; color: #f0f2f5; font-family: 'Inter', sans-serif; }
+    .main .block-container { max-width: 1100px; padding-top: 2.5rem; padding-bottom: 6rem; }
+    
+    /* Modern Premium Hero Section Card */
+    .hero-container {
+        background: linear-gradient(135deg, #131722 0%, #1a1f2c 100%);
+        border-left: 5px solid #00c6ff;
+        border-image: linear-gradient(to bottom, #00c6ff, #0072ff) 1;
+        padding: 30px;
+        border-radius: 4px;
+        margin-bottom: 35px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Elegant CSS Gradient Titles */
+    .gradient-title {
+        background: linear-gradient(to right, #00c6ff, #0072ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 42px !important;
+        font-weight: 800 !important;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    /* Structural Step Section Framing Cards */
+    .step-card {
+        background-color: #141822; 
+        padding: 25px; 
+        border-radius: 12px; 
+        border: 1px solid #22293a; 
+        margin-top: 15px;
+        margin-bottom: 25px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    }
+    
+    /* Interactive Highlight Buttons */
     div.stButton > button:first-child {
         background-image: linear-gradient(to right, #00c6ff, #0072ff);
-        color: white; border: none; border-radius: 10px; font-weight: bold; height: 3em; width: 100%;
+        color: white; border: none; border-radius: 10px; font-weight: bold; height: 3.4em; width: 100%;
+        box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3);
+        transition: all 0.3s ease;
+        font-size: 16px;
     }
     div.stButton > button:first-child:hover {
         background-image: linear-gradient(to right, #0072ff, #00c6ff);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
     }
+    
+    /* Clean System Menu Hiding Customizations */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     .stDeployButton {display:none;}
     
+    /* Amazon Product Monetization Layout Cards */
     .main-content { padding-bottom: 80px; }
     .gear-card {
-        background-color: #1e222b; 
+        background-color: #141822; 
         padding: 20px; 
-        border-radius: 8px; 
-        border: 1px solid #262730; 
+        border-radius: 10px; 
+        border: 1px solid #22293a; 
         text-align: center; 
-        height: 280px;
+        height: 290px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -107,15 +154,19 @@ def generate_chunk_audio_via_cli(text, voice_id, output_path):
 # ==============================================================================
 # SECTION 3: HEADER & APP INTRODUCTION
 # ==============================================================================
-st.title("🎙️ PDF to Voice Pro")
-st.subheader("Convert your documents into high-quality, audible study guides.")
-st.write("A 100% free, privacy-first open-source utility with zero subscription paywalls, no character limits, and no registration required.")
+st.markdown("""
+<div class="hero-container">
+    <div class="gradient-title">🎙️ PDF to Voice Pro</div>
+    <h3 style="margin-top: 0; margin-bottom: 12px; font-weight: 500; color: #e1e7f0;">Convert your documents into high-quality, audible study guides.</h3>
+    <p style="color: #9cb0c9; margin: 0; font-size: 14px; line-height: 1.5;">A 100% free, privacy-first open-source utility with zero subscription paywalls, no character limits, and no registration required.</p>
+</div>
+""", unsafe_allow_html=True)
 
 # ==============================================================================
 # SECTION 4: VOICE SELECTION & LANGUAGE SETTINGS
 # ==============================================================================
-st.write("---")
-st.markdown("### ⚙️ 1. System Configuration")
+st.markdown('<div class="step-card">', unsafe_allow_html=True)
+st.markdown("<h3 style='margin-top:0; color:#00c6ff;'>⚙️ 1. System Configuration</h3>", unsafe_allow_html=True)
 
 AVAILABLE_VOICES = {
     "English (US) - Guy (Neural Male)": "en-US-GuyNeural",
@@ -133,19 +184,23 @@ with voice_col1:
     voice_selection = st.selectbox("Select an AI Voice Talent:", options=list(AVAILABLE_VOICES.keys()), index=0)
     selected_voice_id = AVAILABLE_VOICES[voice_selection]
 with voice_col2:
+    st.markdown("<div style='padding-top: 24px;'></div>", unsafe_allow_html=True)
     st.info("💡 Pro Tip: Male voices often sound best at 1.2x speed for dense study notes.")
+st.markdown('</div>', unsafe_allow_html=True)
 
 # ==============================================================================
 # SECTION 5: FILE UPLOAD INTERFACE
 # ==============================================================================
-st.write("---")
-st.markdown("### 📄 2. Upload Document")
+st.markdown('<div class="step-card">', unsafe_allow_html=True)
+st.markdown("<h3 style='margin-top:0; color:#00c6ff;'>📄 2. Upload Document</h3>", unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Drag and drop your file here (Supports PDF and TXT formats)", type=["pdf", "txt"])
+st.markdown('</div>', unsafe_allow_html=True)
 
 # ==============================================================================
 # SECTION 6: MAIN AUDIO GENERATION WORKFLOW
 # ==============================================================================
 if uploaded_file is not None:
+    st.markdown('<div class="step-card">', unsafe_allow_html=True)
     st.success(f"Successfully loaded: **{uploaded_file.name}**")
     full_raw_text = ""
     
@@ -153,14 +208,12 @@ if uploaded_file is not None:
         full_raw_text = uploaded_file.read().decode("utf-8", errors="ignore")
     else:
         try:
-            # Memory-Optimized Streaming Parser: Extracts page-by-page to keep RAM footprint ultra-low
             with pdfplumber.open(uploaded_file) as pdf:
                 extracted_pages = []
                 for page in pdf.pages:
                     text = page.extract_text()
                     if text:
                         extracted_pages.append(text)
-                    # Force empty layout references immediately out of cache memory
                     page.flush_cache()
                 full_raw_text = " ".join(extracted_pages)
                 del extracted_pages
@@ -171,7 +224,6 @@ if uploaded_file is not None:
     cleaned_text = clean_extracted_text(full_raw_text)
     total_chars = len(cleaned_text)
     
-    # Delete the raw extraction string to save memory space immediately
     del full_raw_text
     gc.collect()
     
@@ -183,11 +235,10 @@ if uploaded_file is not None:
         text_chunks = split_text_into_chunks(cleaned_text, max_chars=2000)
         total_chunks = len(text_chunks)
         
-        # Clear cleaned text layout memory block after split segmentation pass
         del cleaned_text
         gc.collect()
         
-        st.markdown("### ⚡ 3. Compile Master Audio File")
+        st.markdown("<h3 style='margin-top:15px; color:#00c6ff;'>⚡ 3. Compile Master Audio File</h3>", unsafe_allow_html=True)
         st.write(f"The text has been formatted into **{total_chunks} optimized chunks** for high-speed streaming processing.")
         
         if st.button("Generate MP3 Audio Guide"):
@@ -239,7 +290,6 @@ if uploaded_file is not None:
                 except Exception as merge_error:
                     st.error(f"Error compiling master output file track assembly: {str(merge_error)}")
                 finally:
-                    # Comprehensive post-run disk and memory cleanup pass
                     for temp_file in chunk_files:
                         if os.path.exists(temp_file):
                             os.remove(temp_file)
@@ -249,6 +299,7 @@ if uploaded_file is not None:
                     gc.collect()
             else:
                 st.error("Audio conversion failed during step compilation tracking pipeline updates.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ==============================================================================
 # SECTION 7: NATIVE AMAZON ASSOCIATES MONETIZATION HUB
@@ -329,10 +380,10 @@ footer_html = """
     <style>
     .footer {
         position: fixed; left: 0; bottom: 0; width: 100%;
-        background-color: rgba(14, 17, 23, 0.98); color: #8a99ad;
+        background-color: rgba(11, 13, 18, 0.98); color: #8a99ad;
         display: flex; justify-content: space-between; align-items: center;
         padding: 10px 40px; font-family: sans-serif; font-size: 14px;
-        border-top: 1px solid #262730; z-index: 999; box-sizing: border-box;
+        border-top: 1px solid #22293a; z-index: 999; box-sizing: border-box;
     }
     .footer-text { margin: 0; }
     .footer-btn { height: 36px !important; width: 129px !important; }
