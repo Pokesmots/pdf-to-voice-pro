@@ -75,6 +75,7 @@ st.markdown("""
     /* High-Visibility Custom Form Input Framing */
     div[data-baseweb="select"] { background-color: #0f172a !important; border-radius: 8px; }
     div[data-testid="stFileUploaderDropzone"] { background-color: #0f172a !important; border: 2px dashed #64748b !important; }
+    textarea { background-color: #0f172a !important; color: #f1f5f9 !important; border: 1px solid #475569 !important; border-radius: 8px !important; }
     
     /* Premium Action Button Customizations */
     div.stButton > button:first-child {
@@ -197,23 +198,18 @@ with voice_col2:
 st.markdown('</div>', unsafe_allow_html=True)
 
 # ==============================================================================
-# SECTION 5: FILE UPLOAD INTERFACE
+# SECTION 5: FILE UPLOAD & TEXT SANDBOX INTERFACE
 # ==============================================================================
 st.markdown('<div class="step-card">', unsafe_allow_html=True)
-st.markdown("<h3>📄 2. Upload Document</h3>", unsafe_allow_html=True)
-uploaded_file = st.file_uploader("Drag and drop your file here (Supports PDF and TXT formats)", type=["pdf", "txt"])
-st.markdown('</div>', unsafe_allow_html=True)
+st.markdown("<h3>📄 2. Input Document & Custom Text Clipping</h3>", unsafe_allow_html=True)
 
-# ==============================================================================
-# SECTION 6: MAIN AUDIO GENERATION WORKFLOW
-# ==============================================================================
+uploaded_file = st.file_uploader("Drag and drop your file here (Supports PDF and TXT formats)", type=["pdf", "txt"])
+
+# Handle background text extraction safely into a persistent state string
+extracted_text_placeholder = ""
 if uploaded_file is not None:
-    st.markdown('<div class="step-card">', unsafe_allow_html=True)
-    st.success(f"Successfully loaded: **{uploaded_file.name}**")
-    full_raw_text = ""
-    
     if uploaded_file.name.endswith('.txt'):
-        full_raw_text = uploaded_file.read().decode("utf-8", errors="ignore")
+        extracted_text_placeholder = uploaded_file.read().decode("utf-8", errors="ignore")
     else:
         try:
             with pdfplumber.open(uploaded_file) as pdf:
@@ -223,28 +219,35 @@ if uploaded_file is not None:
                     if text:
                         extracted_pages.append(text)
                     page.flush_cache()
-                full_raw_text = " ".join(extracted_pages)
+                extracted_text_placeholder = " ".join(extracted_pages)
                 del extracted_pages
                 gc.collect()
         except Exception as e:
             st.error(f"Error parsing content structure: {e}")
 
-    cleaned_text = clean_extracted_text(full_raw_text)
-    total_chars = len(cleaned_text)
+# The Custom Text Clipping Sandbox Box
+editable_text = st.text_area(
+    label="Text Clipping Sandbox (Edit, delete pages, or paste custom snippets here before compiling):",
+    value=clean_extracted_text(extracted_text_placeholder),
+    height=250,
+    help="You can manually trim paragraphs or paste a specific snippet to convert only what you need."
+)
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ==============================================================================
+# SECTION 6: MAIN AUDIO GENERATION WORKFLOW
+# ==============================================================================
+if editable_text:
+    st.markdown('<div class="step-card">', unsafe_allow_html=True)
+    total_chars = len(editable_text)
     
-    del full_raw_text
-    gc.collect()
-    
-    if total_chars < 10:
-        st.error("Could not parse enough clear text from this document layout. Please make sure this is a text-based document or upload a plain .txt file!")
+    if total_chars < 5:
+        st.error("Please ensure you have entered or extracted clear text to process!")
     else:
         st.metric(label="Total Processable Characters", value=f"{total_chars:,}")
         
-        text_chunks = split_text_into_chunks(cleaned_text, max_chars=2000)
+        text_chunks = split_text_into_chunks(editable_text, max_chars=2000)
         total_chunks = len(text_chunks)
-        
-        del cleaned_text
-        gc.collect()
         
         st.markdown("<h3 style='margin-top:15px;'>⚡ 3. Compile Master Audio File</h3>", unsafe_allow_html=True)
         st.write(f"The text has been formatted into **{total_chunks} optimized chunks** for high-speed streaming processing.")
@@ -289,10 +292,15 @@ if uploaded_file is not None:
                         audio_bytes = final_audio.read()
                         
                         st.audio(audio_bytes, format="audio/mp3")
+                        
+                        dl_name = "custom_clipped_audio.mp3"
+                        if uploaded_file is not None:
+                            dl_name = f"{os.path.splitext(uploaded_file.name)[0]}_audio.mp3"
+                            
                         st.download_button(
                             label="⬇️ Download Full Master MP3 Guide",
                             data=audio_bytes,
-                            file_name=f"{os.path.splitext(uploaded_file.name)[0]}_audio.mp3",
+                            file_name=dl_name,
                             mime="audio/mp3"
                         )
                 except Exception as merge_error:
